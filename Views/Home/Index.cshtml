@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/modernizr-2.5.3.js")" type="text/javascript"></script>
+    <meta name="viewport" content="width=device-width" />
+    <title> Data Pegawai</title>
+</head>
+<body>
+    <header>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p class="site-title">
+                    <br />
+                    <H1>STMIK AMIKOM Purwokerto</H1>
+                </p>
+            </div>
+        </div>
+    </header>
+    <div id="body">
+        <section class="featured">
+            <table>
+                <tr>
+                    <td> @Html.Label("NIP");</td>
+                    <td> @Html.TextBox("PegawaiId");</td>
+                    <td>
+                        <input type="button" name="btnGetById" value="Data Pegawai Berdasarkan NIP" onclick="GetPegawaiByIdJSON()" />
+                        <input type="button" name="btnGetAll" value="Data Pegawai" onclick="GetPegawaiJSON()" />
+                    </td>
+                </tr>
+            </table>
+        </section>
+        <div id="employees" />
+        <div id="employeesEdit">
+            <table>
+                <tr>
+                    <td>@Html.Label("Nama")</td>
+                    <td>@Html.TextBox("txtNama")</td>
+                </tr>
+                <tr>
+                    <td>@Html.Label("Gender")</td>
+                    <td>@Html.TextBox("txtGender")</td>
+                </tr>
+                <tr>
+                    <td>@Html.Label("Alamat")</td>
+                    <td>@Html.TextArea("txtAlamat")</td>
+                </tr>
+                <tr>
+                    <td>@Html.Label("Kode Jabatan")</td>
+                    <td>@Html.TextBox("txtKode")</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label id="errMsg" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="button" name="btnTambah" value="TAMBAH" onclick="" />
+                        <input type="button" name="btnHapus" value="HAPUS" onclick="" />
+                        <input type="button" name="btnUpdate" value="UPDATE" onclick="" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+<script src="scripts/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script>
+    //Fungsi untuk me-reset isian form
+    function ResetForm() {
+        $("#txtNama").val("");
+        $("#txtGender").val("");
+        $("#txtAlamat").val("");
+        $("#txtKode").val("");
+    }
+    //Fungsi untuk memperoleh data dosen keseluruhan
+    function GetPegawaiJSON() {
+        $.getJSON("/amikom/pegawai", function (data) {
+            ResetForm();
+            var strHTML = "<table width='50%' style='border-width:thin;font-family:Verdana;font-size:small;bordercollapse:collapse' border='1'>";
+            strHTML += "<tr><th>NIP</th><th>Nama</th><th>Gender</th><th>Alamat</th><th>Kode Jabatan</th></tr>";
+            $.each(data, function (key, val) {
+                strHTML += "<tr>";
+                strHTML += "<td width='20%' style='border:1 solid gray;'>" + val.nip + "</td>";
+                strHTML += "<td width='20%' style='border:1 solid gray;'>" + val.nama + "</td>";
+                strHTML += "<td width='20%' style='border:1 solid gray;'>" + val.jenis_kelamin + "</td>";
+                strHTML += "<td width='20%' style='border:1 solid gray;'>" + val.alamat + "</td>";
+                strHTML += "<td width='20%' style='border:1 solid gray;'>" + val.kode_jabatan + "</td>";
+                strHTML += "</tr>";
+            });
+            $('#employees').append(strHTML);
+        });
+    }
+    //Fungsi untuk memperoleh data pegawai berdasarkan NIP (Pegawai ID)
+    function GetPegawaiByIdJSON() {
+        $.getJSON("/amikom/pegawai/" + $("#PegawaiId").val(),
+        function (data) {
+            if (data != null) {
+                $("#txtNama").val(data.nama);
+                $("#txtGender").val(data.jenis_kelamin);
+                $("#txtAlamat").val(data.alamat);
+                $("#txtKode").val(data.kode_jabatan);
+                $('#errMsg').html('');
+            }
+            else {
+                alert("Data pegawai tidak terdaftar di dalam database");
+                ResetForm();
+            }
+        })
+        .fail(
+        function (jqXHR, textStatus, err) {
+            $('#errMsg').html('Error: ' + err);
+        });
+        return false;
+    }
+</script>
+
